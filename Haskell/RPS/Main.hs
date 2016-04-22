@@ -17,7 +17,7 @@ possibleHands = [Rock, Paper, Scissors]
 randomHand :: IO Hand
 randomHand = runRVar handChoice DevRandom
     where
-        handChoice = choice(possibleHands)
+        handChoice = choice possibleHands
 -- maybe remove io here?
 performPlay :: Hand -> Hand -> IO ()
 performPlay userHand compHand = do
@@ -84,13 +84,13 @@ getBeatingHand inHand
 -- type alias or data type?
 getHandOccurencesBasedOnCache :: String -> String -> Map Hand Int
 
-getHandOccurencesBasedOnCache cache content = do
+getHandOccurencesBasedOnCache cache content =
     go cache content empty
     where
         go :: String -> String -> Map Hand Int -> Map Hand Int
         go key content accMap
             | contentLength < 2 || keyLength >= contentLength = accMap
-            | (reverse key) `isPrefixOf` content = go key (tail content) (insertWith (+) (deserializeHand (content !! keyLength)) 1 accMap)
+            | reverse key `isPrefixOf` content = go key (tail content) (insertWith (+) (deserializeHand (content !! keyLength)) 1 accMap)
             | otherwise = go key (tail content) accMap
             where
                 keyLength = length key
@@ -98,7 +98,7 @@ getHandOccurencesBasedOnCache cache content = do
 
 -- remove io here (?)
 chooseBestHand :: Map Hand Int -> IO Hand
-chooseBestHand nextHandOccurences = do
+chooseBestHand nextHandOccurences =
     go Nothing $ toList nextHandOccurences
     where
         go :: Maybe (Hand, Int) -> [(Hand, Int)] -> IO Hand
@@ -121,7 +121,7 @@ chooseBestHand nextHandOccurences = do
         selectRandomHandFromEqOccurences h1 h2 = runRVar (choice [h1, h2]) DevRandom
 
 calculateAIHand :: Cache -> String -> IO Hand
-calculateAIHand cs dbContent = d
+calculateAIHand cs dbContent =
     chooseBestHand $ getHandOccurencesBasedOnCache cacheValue dbContent
         where
         cacheValue = catMaybes cs
